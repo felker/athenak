@@ -350,7 +350,7 @@ TaskStatus ParticlesBoundaryValues::PackAndSendPrtcls() {
     auto &rsendbuf = prtcl_rsendbuf;
     auto &isendbuf = prtcl_isendbuf;
     par_for("ppack",DevExeSpace(),0,(nprtcl_send-1), KOKKOS_LAMBDA(const int n) {
-      int p = sendlist.d_view(n).prtcl_indx;
+      int p = this->sendlist.d_view(n).prtcl_indx;
       for (int i=0; i<nidata; ++i) {
         isendbuf(nidata*n + i) = pi(i,p);
       }
@@ -469,7 +469,7 @@ TaskStatus ParticlesBoundaryValues::RecvAndUnpackPrtcls() {
     int &npart = pmy_part->nprtcl_thispack;
     par_for("punpack",DevExeSpace(),0,(nprtcl_recv-1), KOKKOS_LAMBDA(const int n) {
       int p;
-      if (n < nprtcl_send) {
+      if (n < this->nprtcl_send) {
         p = sendlist.d_view(n).prtcl_indx; // place particles in holes created by sends
       } else {
         p = npart + (n - nprtcl_send);     // place particle at end of arrays
